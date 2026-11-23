@@ -1,0 +1,89 @@
+
+#include <Wire.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+
+// Create MPU6050 sensor object
+Adafruit_MPU6050 mpu;
+
+// I2C pins on ESP32-C3
+#define SDA_PIN 4
+#define SCL_PIN 5
+
+void setup() {
+
+  // Start Serial Monitor
+  Serial.begin(115200);
+  delay(1000);
+
+  // Start I2C communication
+  Wire.begin(SDA_PIN, SCL_PIN);
+
+  Serial.println("Starting MPU6050 test...");
+
+  // Try the common MPU6050 addresses
+  if (!mpu.begin(0x68)) {
+
+    if (!mpu.begin(0x69)) {
+      Serial.println("ERROR: MPU6050 not found!");
+      Serial.println("Check wiring and I2C address.");
+
+      while (1) {
+        delay(100);
+      }
+    }
+  }
+
+  // Set accelerometer range
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+
+  // Set gyroscope range
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+
+  // Set filter bandwidth
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+  Serial.println("MPU6050 connected successfully!");
+  Serial.println("--------------------------------");
+}
+
+void loop() {
+
+  sensors_event_t a, g, temp;
+
+  // Read sensor data
+  mpu.getEvent(&a, &g, &temp);
+
+  // Print acceleration values
+  Serial.println("ACCELERATION (m/s^2)");
+
+  Serial.print("X: ");
+  Serial.print(a.acceleration.x);
+
+  Serial.print(" | Y: ");
+  Serial.print(a.acceleration.y);
+
+  Serial.print(" | Z: ");
+  Serial.println(a.acceleration.z);
+
+  // Print gyroscope values
+  Serial.println("GYROSCOPE (rad/s)");
+
+  Serial.print("X: ");
+  Serial.print(g.gyro.x);
+
+  Serial.print(" | Y: ");
+  Serial.print(g.gyro.y);
+
+  Serial.print(" | Z: ");
+  Serial.println(g.gyro.z);
+
+  // Print chip temperature
+  Serial.print("Chip Temperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" C");
+
+  Serial.println("--------------------------------");
+
+  delay(1000);
+}
