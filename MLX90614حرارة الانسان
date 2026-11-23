@@ -1,0 +1,42 @@
+
+#include <Wire.h>
+#include <Adafruit_MLX90614.h>
+
+#define SDA_PIN 4
+#define SCL_PIN 5
+
+Adafruit_MLX90614 mlx = Adafruit_MLX90614();
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  Wire.begin(SDA_PIN, SCL_PIN);
+
+  Serial.println("Starting MLX90614 test...");
+
+  if (!mlx.begin(0x5A, &Wire)) {
+    Serial.println("ERROR: MLX90614 not found!");
+    while (1) delay(100);
+  }
+
+  Serial.println("MLX90614 connected successfully!");
+}
+
+void loop() {
+
+  float ambientTemp = mlx.readAmbientTempC();
+  float objectTemp = mlx.readObjectTempC();
+
+  Serial.print("Ambient Temperature: ");
+  Serial.print(ambientTemp);
+  Serial.println(" C");
+
+  Serial.print("Object Temperature: ");
+  Serial.print(objectTemp);
+  Serial.println(" C");
+
+  Serial.println("----------------------");
+
+  delay(2000);
+}
